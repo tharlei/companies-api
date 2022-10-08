@@ -27,7 +27,7 @@ class ListCompaniesEloquentQuery implements ListCompaniesQuery
         $companies['data'] = collect($companies['data'])->map(fn ($company) => [
             'id' => $company['id'],
             'name' => $company['name'],
-            'phone' => $company['phone'],
+            'phone' => preg_replace('/[^0-9]/', '', $company['phone']),
             'description' => $company['description'],
             'email' => $company['email'],
         ])->toArray();
@@ -37,7 +37,7 @@ class ListCompaniesEloquentQuery implements ListCompaniesQuery
 
     private function executeQuery(int $page, ListCompaniesInput $input): LengthAwarePaginator
     {
-        $companies = $this->companyModel->select('*');
+        $companies = $this->companyModel->orderBy('name');
 
         if ($input->federalUnit) {
             $companies->where('federal_unit', $input->federalUnit);
